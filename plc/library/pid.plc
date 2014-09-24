@@ -15,22 +15,21 @@
 (* Outputs:                                *)
 (*  AV - action variable                   *)
 (* *************************************** *)
-(* Include: max.plc, min.plc *)
 FUNCTION_BLOCK	pid
 	VAR_INPUT
-		P: DINT := 0;
-		I: DINT := 0;
-		D: DINT := 0;
-		ISAT: DINT := 16#0fff_ffff_ffff_ffff;
-		PV: DINT := 0;
+		P: REAL := 0;
+		I: REAL := 0;
+		D: REAL := 0;
+		ISAT: DINT := 16#0fff_ffff_ffff_ffff; 
+		PV: REAL := 0;
 	END_VAR
 	VAR_OUTPUT
-		AV: UDINT := 0; (* Action Variable *)
+		AV: REAL := 0; (* Action Variable *)
 	END_VAR
 	VAR
-		OLD_PV: DINT := 0;
-		INTEGRATION: DINT := 0;
-		TMPSAT: DINT;
+		OLD_PV: REAL := 0;
+		INTEGRATION: REAL := 0;
+		TMPSAT: REAL;
 	END_VAR
 
 	(* Calculate P part of controler *)
@@ -48,20 +47,25 @@ FUNCTION_BLOCK	pid
 	(* Calculate I part of controler *)
 	LD	PV
 	ADD	INTEGRATION
-
-	min	ISAT
-
 	ST	INTEGRATION
 
-	LD	ISAT
-	
+	LE	ISAT
+	JMPC	test_minsat
+
+	LD	0
+
+	JMP	compute_int
+
+test_minsat:	
 	LD	ISAT
 	MUL	-1
 	ST	TMPSAT
 
-	LD	INTEGRATION
-	max	TMPSAT
+	LE	INTEGRATION
+	JMPC	compute_int
 
+	LD	0
+compute_int:
 	ST	INTEGRATION
 
 	MUL	I

@@ -114,7 +114,7 @@ extern FILE *yyin;
 
 void help(void)
 {
-	cout << "plc2cpp 0.01a\n\n";
+	cout << "plc2cpp 1.01\n\n";
 	cout << "  --target [-t] directory  Target directory for converted PLC sources\n";
 	cout << "  --source [-s] file       Name of source file in PLC IL language\n";
 	cout << "  --project [-p] file      Name of project file\n";

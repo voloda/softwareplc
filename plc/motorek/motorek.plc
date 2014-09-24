@@ -37,6 +37,7 @@ FUNCTION_BLOCK pwm
 
 	LD	pwmval
 	LT	0
+	
 	ST	runback
 
 	JMPCN	runpwm
@@ -109,7 +110,6 @@ PROGRAM prg_motorek
 		RPS: DINT;
 	END_VAR
 
-
 	LD	P
 	ST	controler.P
 	LD	I
@@ -119,7 +119,8 @@ PROGRAM prg_motorek
 	LD	ISAT
 	ST	controler.ISAT
 
-	LD	SP
+	LD	1.3
+	MUL	SP
 	SUB	RPS
 
 	ST	controler.PV
@@ -219,7 +220,7 @@ PROGRAM	prg_RPS
 	ADD	OtOld
 	DIV	2
 	ST	OtOld
-	MUL	200
+	MUL	20
 	DIV	16
 	ST	RPS
 
@@ -249,20 +250,20 @@ CONFIGURATION motorek
 		(* TRUE - otaceni vpred, FALSE - otaceni vzad *)
 		Direction: BOOL := FALSE;
 
-		(* Constants for PID controler *)
-		P: DINT := 1;
-		I: DINT := 2; 
-		D: DINT := 2;
+		(* Constants for PID controler 3, 0.5 *)
+		P: REAL := 3;
+		I: REAL := 0.5; 
+		D: REAL := 0;
 
 		ISAT: DINT := 100;
 	END_VAR
 
 	RESOURCE xx ON yy
-		TASK rustTask(INTERVAL:=T#0.1ms);
-		TASK measureRotationTask(INTERVAL:=T#0.05ms);
-		TASK measureRPSTask(INTERVAL:=T#5ms);
+		TASK controlTask(INTERVAL:=T#0.1ms, PRIORITY := 20);
+		TASK measureRotationTask(INTERVAL:=T#0.05ms, PRIORITY := 50);
+		TASK measureRPSTask(INTERVAL:=T#50ms, PRIORITY := 30);
 
-		PROGRAM p1 WITH rustTask: prg_motorek(); 
+		PROGRAM p1 WITH controlTask: prg_motorek(); 
 		PROGRAM p2 WITH measureRotationTask: prg_otacky();
 		PROGRAM p3 WITH measureRPSTask: prg_rps();
 	END_RESOURCE

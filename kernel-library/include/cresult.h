@@ -17,7 +17,7 @@
  *
  *  Author: Vladimir Kloz <Vladimir.Kloz@dtg.cz>
  *  Project home: http://sourceforge.net/projects/softwareplc
- *  Version: $Revision: 1.10 $
+ *  Version: $Revision: 1.11 $
  */
 
 #ifndef _RTL_PLC_CRESULT
@@ -66,7 +66,7 @@
 	 * @param dt	Specified data type
 	 * @param op	Implemented operator (+,-,/ ....)
 	 */
-	#define CResultOp(dt, op)	case DT_##dt: InternalData.m_##dt##_Value op##= Value.InternalData.m_##dt##_Value; break;
+	#define CResultOp(dt, op)	case DT_##dt: this->InternalData.m_##dt##_Value op##= Value.Result##dt(); break;
 
 	/**
 	 * Macro for short implementation of comparing operators
@@ -75,7 +75,7 @@
 	 * @param dt	Specified data type
 	 * @param op	Implemented operator (<,<=,==, ...)
 	 */
-	#define CResultCmpOp(dt, op)	case DT_##dt: return(InternalData.m_##dt##_Value op Value.InternalData.m_##dt##_Value); break;
+	#define CResultCmpOp(dt, op)	case DT_##dt: return(InternalData.m_##dt##_Value op Value.Result##dt()); break;
 
 	/**
 	 * Macro for short implementation when getting
@@ -85,6 +85,7 @@
 	 * @param dt	Internaly stored data type
 	 */
 	#define CResultGV(dt)	case DT_##dt: Var =  (DataType) InternalData.m_##dt##_Value; break;
+
 	/**
 	 * Macro for short implementation when getting
 	 * negated current result into CVariable<> or CProperty<>
@@ -93,13 +94,46 @@
 	 * @param dt	Internaly stored data type
 	 */
 	#define CResultNegGV(dt)	case DT_##dt: Var =  ~((DataType) InternalData.m_##dt##_Value); break;
-/**
+
+	/**
+	 * Macro for short implementation when getting internaly
+	 * stored value in operators
+	 *
+	 * @param idt	Internal data type stored in result
+	 * @param rdt	Requested data type into which convert result
+	 */
+	#define CResultDT(idt, rdt)	case DT_##idt: return ((rdt) (this->InternalData.m_##idt##_Value)); break;
+	/**
+	 * Macro for short implementation when getting current
+	 * value of result converted to specified datatype
+	 *
+	 * @param dt	Requested datatype
+	 */
+	#define ImplementResult(dt)		dt Result##dt(void) const \
+					{\
+						switch(m_iStoredDataType) \
+						{\
+							CResultDT(SINT, dt);\
+							CResultDT(INT, dt);\
+							CResultDT(DINT, dt);\
+							CResultDT(USINT, dt);\
+							CResultDT(UINT, dt);\
+							CResultDT(UDINT, dt);\
+							CResultDT(REAL, dt);\
+							CResultDT(TIME, dt);\
+							CResultDT(BYTE, dt);\
+							CResultDT(WORD, dt);\
+							CResultDT(DWORD, dt);\
+						}\
+						return ((dt)0);\
+					}
+	/**
 	 * This class implements  result functionality for PLC
 	 * IL language operations.
 	 * All operations (comparisions, additions, multiplications...)
 	 * are defined here as operators
 	 *
-	 * @version	$Revision: 1.10 $
+	 * @version	$Revision: 1.11 $
 	 * @author	Voloda <Vladimir.Kloz@dtg.cz>
 	 */
 	class CResult
@@ -127,10 +161,27 @@
 				TOD	m_todValue;
 				DT	m_dtValue;
 				*/
-				BYTE	m_bValue;
-				WORD	m_wValue;
-				DWORD	m_dwValue;
+				BYTE	m_BYTE_Value;
+				WORD	m_WORD_Value;
+				DWORD	m_DWORD_Value;
 			} InternalData;
+			
+			/*
+			 * Implementation of functions, which returns
+			 * internal value converted into specified datatype
+			 */
+			ImplementResult(SINT);
+			ImplementResult(INT);
+			ImplementResult(DINT);
+			ImplementResult(USINT);
+			ImplementResult(UINT);
+			ImplementResult(UDINT);
+			ImplementResult(REAL);
+			ImplementResult(TIME);
+			ImplementResult(BYTE);
+			ImplementResult(WORD);
+			ImplementResult(DWORD);
+
 			/**
 			 * Contain information about current data type
 			 * stored in result object as defined in
@@ -278,7 +329,7 @@
 				 * kernel space. Returns current value
 				 * stored in result
 				 */
-				if (InternalData.m_REAL_Value == 0)
+				if (Value.ResultINT() == 0)
 				{
 					rtl_printf("SoftwarePLC: Division by zerp detected, returned result is wrong!");
 					return (*this);

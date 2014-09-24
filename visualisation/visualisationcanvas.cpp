@@ -17,33 +17,34 @@
  *
  *  Author: Vladimir Kloz <Vladimir.Kloz@dtg.cz>
  *  Project home: http://sourceforge.net/projects/softwareplc
- *  Version: $Revision: 1.2 $
+ *  Version: $Revision: 1.4 $
  */
 
 #include <wx/pen.h>
 #include <wx/dcmemory.h>
 #include <wx/bitmap.h>
 #include <wx/msgdlg.h>
+#include <wx/thread.h>
 
 #include "include/visualisationcanvas.h"
 #include "include/measure.h"
 
-#define ROT_MAX	0x90
-#define ROT_MIN	-0x90
+#define ROT_MAX	110
+#define ROT_MIN	-110
 
 BEGIN_EVENT_TABLE(CVisualisationCanvas, wxPanel)
 	EVT_SIZE( CVisualisationCanvas :: OnSize)
 	EVT_TIMER(-1, CVisualisationCanvas :: OnTimer)
 END_EVENT_TABLE()
 
-extern CMeasureThread MeasureThread;
+extern CMeasureThread *MeasureThread;
 
 CVisualisationCanvas :: CVisualisationCanvas(wxFrame *pParent, const wxPoint &coord, const wxSize &size)
 	: wxPanel(pParent, -1, coord, size), m_RedrawTimer(this)
 {
 	m_pParent = pParent;
 	
-	MeasureThread.SetVectors(&m_CurrentValue, &m_WantedValue); //, &m_CurrentValue);
+	MeasureThread->SetVectors(&m_CurrentValue, &m_WantedValue); //, &m_CurrentValue);
 
 	// SetBackgroundColour(wxColor(0, 0, 0));
 
@@ -54,7 +55,7 @@ CVisualisationCanvas :: ~CVisualisationCanvas()
 {
 	m_RedrawTimer.Stop();
 
-	MeasureThread.SetVectors();
+	MeasureThread->SetVectors();
 }
 
 
@@ -62,37 +63,55 @@ void CVisualisationCanvas :: DrawAxes(wxDC &dc)
 {
 	wxSize	MySize;
 	wxString	sDisplay;
-	
+	double		dPosun, dConst;
+       	int		iPos;
+	int		iDrawSubAxes[] = {100, 75, 50, 25, -25, -50, -75, -100};
+
 	wxPen	AxesPen(wxColour(255, 255, 255), 1, wxSOLID);
 	
 	MySize = this->GetSize();
 	
 	dc.SetPen(AxesPen);
 	
-	dc.DrawLine(29, MySize.GetHeight() / 2, MySize.GetWidth(), MySize.GetHeight() / 2);
+	dPosun = MySize.GetHeight() / 2;
+
+	dc.DrawLine(29, (int) dPosun, MySize.GetWidth(), (int)dPosun);
+
 
 	dc.DrawLine(30, 0, 30, MySize.GetHeight());
 	
 	dc.SetTextBackground(wxColor(0, 0, 0));
 	dc.SetTextForeground(wxColor(255, 255, 255));
 	
-	for (int i = 0; i < 4; i++)
-	{
-		int	iWidth, iHeight;
-
-		sDisplay << ROT_MAX/i;
-//		dc.GetTextExtent(
-		dc.DrawText(sDisplay, 2, 10);
-	}
-
-	
 	AxesPen.SetStyle(wxDOT);
 	
 	dc.SetPen(AxesPen);
 	
-	dc.DrawLine(29, MySize.GetHeight() / 4, MySize.GetWidth(), MySize.GetHeight() / 4);
-	dc.DrawLine(29, 3*MySize.GetHeight() / 4, MySize.GetWidth(), 3*MySize.GetHeight() / 4);
+	dConst = dPosun / (double)ROT_MAX;
 
+	for (int i = 0; i < sizeof(iDrawSubAxes)/sizeof(int); i++)
+	{
+		char pBuff[50];
+		
+		iPos = (int)(dPosun - iDrawSubAxes[i] * dConst);
+	
+		dc.DrawLine(29, iPos, MySize.GetWidth(), iPos);
+
+		snprintf(pBuff, 50, "%d", iDrawSubAxes[i]);
+		
+		WriteText(dc, pBuff, iPos, 27);
+	}
+	
+	WriteText(dc, "0", (int) dPosun, 27);
+}
+
+void CVisualisationCanvas :: WriteText(wxDC &dc, const wxString &sText, int iYMiddle, int iXMax)
+{
+	wxCoord	TextWidth, TextHeight;
+
+	dc.GetTextExtent(sText, &TextWidth, &TextHeight);
+
+	dc.DrawText(sText, iXMax - TextWidth, iYMiddle - (TextHeight / 2));
 }
 
 void CVisualisationCanvas :: OnSize(wxSizeEvent& event)
@@ -121,7 +140,8 @@ void CVisualisationCanvas :: OnTimer(wxTimerEvent& event)
 	wxClientDC	dcPanel(this);
 	int		iSize, iSizeWanted;
 	wxBrush		bkBrush(wxColor(0, 0, 0), 1);
-
+	char		pBuff[100];
+	
 	double	dConst;
 	int	iPosun;
 
@@ -165,6 +185,10 @@ void CVisualisationCanvas :: OnTimer(wxTimerEvent& event)
 		dc.DrawLine(i - 1, RecalcYOld, i, RecalcY);
 	}
 
+	snprintf(pBuff, 100, "Aktualni otacky/s: %d", m_CurrentValue[m_CurrentValue.size() - 1]);
+
+	WriteText(dc, pBuff, 10, PanelSize.GetWidth() - 5);
+			
 	m_CurrentValue.Unlock();
 	m_WantedValue.Unlock();
 

@@ -17,7 +17,7 @@
  *
  *  Author: Vladimir Kloz <Vladimir.Kloz@dtg.cz>
  *  Project home: http://sourceforge.net/projects/softwareplc
- *  Version: $Revision: 1.2 $
+ *  Version: $Revision: 1.3 $
  */
 
 #include <sys/types.h>
@@ -70,7 +70,7 @@ void CMeasureThread :: ResetDriver(void)
 	write(m_iControl, &Control, sizeof(Control));
 	
 	Control.Command = PLC_SEND_SET_TIME;
-	Control.iTime = 20;
+	Control.iTime = 50;
 
 	write(m_iControl, &Control, sizeof(Control));
 }
@@ -115,9 +115,15 @@ void *CMeasureThread :: Entry()
 		}
 		else if (pBuff[0] == 'O')
 		{
+			int	iValue;
+			
+			iValue = *(int *)(pBuff + 1);
+
 			m_pProcessVariable->Lock();
-			m_pProcessVariable->AddValue(*((int *) (pBuff + 1)));
+			m_pProcessVariable->AddValue(iValue);
 			m_pProcessVariable->Unlock();
+
+			// cout << "Value: " << iValue << "\n";
 		}
 		else
 			ResetDriver();

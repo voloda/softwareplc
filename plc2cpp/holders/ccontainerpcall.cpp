@@ -17,7 +17,7 @@
  *
  *  Author: Vladimir Kloz <Vladimir.Kloz@dtg.cz>
  *  Project home: http://sourceforge.net/projects/softwareplc
- *  Version: $Revision: 1.10 $
+ *  Version: $Revision: 1.11 $
  */
 
 #include <iostream>
@@ -159,7 +159,7 @@ void CContainerPCall :: GenerateCode(int iCodePart)
 			break;
 		// generates program call thread initialization
 		case 1:
-			CurrentOutput << "\tiRetv += pthread_create(&threads[iCount++], NULL, PCall" << m_sBlockName.c_str() << ", NULL);\n";
+			CurrentOutput << "\tiRetv += pthread_create(&threads[iCount++], &attr, PCall" << m_sBlockName.c_str() << ", NULL);\n";
 			break;
 	}
 }

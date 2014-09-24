@@ -17,7 +17,7 @@
  *
  *  Author: Vladimir Kloz <Vladimir.Kloz@dtg.cz>
  *  Project home: http://sourceforge.net/projects/softwareplc
- *  Version: $Revision: 1.6 $
+ *  Version: $Revision: 1.7 $
  */
 
 #include "include/ccodeprocessor.h"
@@ -107,7 +107,10 @@ void CContainerConfiguration :: GenerateCode(int iType)
 			// generate module initialization routine
 			// ---
 			CurrentOutput << "\n\nint init_module(void)\n{\n";
-			CurrentOutput << "\tint iRetv = 0, iCount = 0;\n\n\t__do_global_ctors_aux();\n\n";
+			CurrentOutput << "\tint iRetv = 0, iCount = 0;\npthread_attr_t\tattr;\n\n\t__do_global_ctors_aux();\n\n";
+
+			CurrentOutput << "\tpthread_attr_init(&attr);\n\tpthread_attr_setfp_np(&attr, 1);\n\n";
+				 
 			// generate code for task thread
 			// initializations (module initialization)
 			m_pPCalls->GenerateCode(1);

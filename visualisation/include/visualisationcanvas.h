@@ -17,7 +17,7 @@
  *
  *  Author: Vladimir Kloz <Vladimir.Kloz@dtg.cz>
  *  Project home: http://sourceforge.net/projects/softwareplc
- *  Version: $Revision: 1.2 $
+ *  Version: $Revision: 1.3 $
  */
 
 #ifndef _CVisualisationCanvas_H_
@@ -41,6 +41,7 @@
 			wxFrame *m_pParent;
 
 			void DrawAxes(wxDC& dc);
+			void WriteText(wxDC &dc, const wxString &sText, int iYMiddle, int iXMax);
 			void OnSize(wxSizeEvent& event);
 			void OnTimer(wxTimerEvent &event);
 

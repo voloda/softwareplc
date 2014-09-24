@@ -17,7 +17,7 @@
  *
  *  Author: Vladimir Kloz <Vladimir.Kloz@dtg.cz>
  *  Project home: http://sourceforge.net/projects/softwareplc
- *  Version: $Revision: 1.2 $
+ *  Version: $Revision: 1.3 $
  */
 
 #include "include/visualisationmain.h"
@@ -29,7 +29,7 @@
 
 #include "include/measure.h"
 
-CMeasureThread	MeasureThread;
+CMeasureThread	*MeasureThread = NULL;
 
 BEGIN_EVENT_TABLE(CVisualisationMain, wxFrame)
 	EVT_SPINCTRL(IDSP_ROTATION_PER_SEC, CVisualisationMain :: OnSetRotation)
@@ -39,25 +39,23 @@ END_EVENT_TABLE()
 CVisualisationMain :: CVisualisationMain(void) : wxFrame(NULL, ID_VISUALISATION_MAIN_WINDOW, "PLC Sample visualisation", wxPoint(0, 0), wxSize(300, 400))
 {
 	new wxStaticText(this, -1, "Pozadovane otacky/s:", wxPoint(5, 10));
-	new wxStaticText(this, -1, "Aktualni otacky/s:", wxPoint(215, 10));
 
-	m_RotPerSecAct = new wxStaticText(this, -1, "xxxx", wxPoint(320, 10));
-	
 	m_RotPerSec = new wxSpinCtrl(this, IDSP_ROTATION_PER_SEC, "0", wxPoint(130, 5), wxSize(70, 30), wxSP_ARROW_KEYS, -1000, 1000);
+
+	MeasureThread = new CMeasureThread;
+
+	MeasureThread->Create();
+	MeasureThread->Run();
+	MeasureThread->SetRotations(0);
 
 	m_Canvas = new CVisualisationCanvas(this, wxPoint(0, 40), wxSize(300, 360));
 
-	MeasureThread.Create();
-	MeasureThread.Run();
-	MeasureThread.SetRotations(0);
 }
 
 CVisualisationMain :: ~CVisualisationMain(void)
 {
 	m_Canvas = NULL;
 	m_RotPerSec = NULL;
-
-	MeasureThread.Delete();
 }
 
 void CVisualisationMain :: OnSetRotation(wxSpinEvent &event)
@@ -67,7 +65,7 @@ void CVisualisationMain :: OnSetRotation(wxSpinEvent &event)
 	{
 		case IDSP_ROTATION_PER_SEC:
 			if (m_RotPerSec != NULL)
-				MeasureThread.SetRotations(m_RotPerSec->GetValue());
+				MeasureThread->SetRotations(m_RotPerSec->GetValue());
 			break;
 	}
 		

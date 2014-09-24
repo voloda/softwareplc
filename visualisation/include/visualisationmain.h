@@ -17,7 +17,7 @@
  *
  *  Author: Vladimir Kloz <Vladimir.Kloz@dtg.cz>
  *  Project home: http://sourceforge.net/projects/softwareplc
- *  Version: $Revision: 1.2 $
+ *  Version: $Revision: 1.3 $
  */
 
 #ifndef _CVisualisationMain_H_
@@ -43,7 +43,6 @@
 
 			wxSpinCtrl	*m_RotPerSec;
 			CVisualisationCanvas	*m_Canvas;
-			wxStaticText	*m_RotPerSecAct;
 			
 			DECLARE_EVENT_TABLE()
 	};
