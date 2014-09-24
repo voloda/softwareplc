@@ -1,0 +1,14 @@
+
+INSTALL_DIR=@prefix@/@datadir@/plc/skeleton
+
+all: 
+
+install:
+# copy directory structure for project skeleton
+	( for x in `find . -type d -name '*'`; do \
+		mkdir -p "$(INSTALL_DIR)/$$x"; \
+	done )
+# install base makefiles
+	@INSTALL@ --mode=0644 Makefile.in.skel $(INSTALL_DIR)/Makefile.in
+	@INSTALL@ --mode=0644 sources/Makefile.in.skel $(INSTALL_DIR)/sources/Makefile.in
+

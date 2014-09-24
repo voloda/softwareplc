@@ -1,0 +1,7 @@
+lex.yy.c
+plc2cpp
+plc2cpp.tab.c
+plc2cpp.tab.h
+*.o
+Makefile
+.depend

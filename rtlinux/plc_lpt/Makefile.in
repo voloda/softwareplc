@@ -1,0 +1,20 @@
+include @top_srcdir@/rtl.mk
+
+CXXFLAGS+= -DPLC_MAX_DEVICES=10 -I../../kernel-library/include
+
+CRTBEGIN=`g++ -print-file-name=crtbegin.o`
+CRTEND=`g++ -print-file-name=crtend.o`
+
+OBJS=lpt.o drv.o drv_sup.o
+
+plc_lpt.o: $(OBJS)
+	$(LD) -r -o plc_lpt.o $(CRTBEGIN) $(OBJS) $(CRTEND)
+
+clean:
+	rm -f *.o
+
+install:
+	cp -f plc_lpt.o @KERNEL_MODULES@
+	depmod -a
+ 
+include @top_srcdir@/Rules.mk

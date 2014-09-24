@@ -1,0 +1,15 @@
+PLC driver for user-space communication.
+
+This driver provides by default 64bytes of input and output addresses, which 
+may be used for communication with user-space from SoftwarePLC by writing to
+selected address. See communicate.cpp file for idea about using this driver.
+
+Parameters:
+
+iladdr ... first PLC address on which will be inputs available (iladdr=10 means
+           that address IB10 coreponds to first input address of driver)
+oladdr ... first PLC address on which will be outputs available (oladdr=5 means
+           that address OB10 corespond with first output address of driver)
+
+For usage requires the plc_devicemanager module loaded.
+

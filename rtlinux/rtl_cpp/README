@@ -1,0 +1,25 @@
+This examples illustrates use of C++ in RTLinux programs.
+You need to be at the console to see the output from insmod app.o.
+
+To use C++ in RTLinux modules, you need to:
+
+- insert rtl_cpp.o support module.
+
+- #include rtl_cpp.h in your RT-program
+
+- if you have statically allocated objects that
+need initializing, call __do_global_ctors_aux() in init_module
+and __do_global_dtors_aux() in cleanup_module (see hello.o)
+
+- link your module with crtbegin.o and crtend.o; the
+order is important (see Makefile)
+
+- the rtl.mk file provides needed CXXFLAGS
+
+Try inserting app.o module as an example.
+
+Thanks to Yunho Jeon <yunho@skylark.snu.ac.kr> for sharing the
+ideas and code on the RTLinux mailing list.
+
+Michael Barabanov <baraban@fsmlabs.com>.
+

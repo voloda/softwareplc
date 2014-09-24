@@ -1,0 +1,43 @@
+include @top_srcdir@/Make.flags
+
+CXXFLAGS+=-Iholders/include -Iinclude -DPLC_LIBDIRS="@prefix@/@datadir@/plc"
+
+PLCOBJS=plc2cpp.tab.o lex.yy.o support.o
+
+all: plc2cpp
+
+plc2cpp: $(PLCOBJS) holders/libcontainers.a
+	$(LD) $(PLCOBJS) -o $@ $(LFLAGS) -Lholders -lcontainers
+
+plc2cpp.tab.c: plc2cpp.y
+	$(YACC) -b plc2cpp -d plc2cpp.y
+
+plc2cpp.tab.h: plc2cpp.y
+	$(YACC) -b plc2cpp -d plc2cpp.y
+
+lex.yy.c: plc2cpp.l plc2cpp.tab.h
+	$(LEX) plc2cpp.l
+
+test: plc2cpp
+	./plc2cpp -s test.plc -p test
+
+clean:
+	rm -rf *.o holders/*.o plc2cpp holders/*.a
+
+install:
+	@INSTALL@ -s plc2cpp @prefix@/@bindir@
+	@INSTALL@ -m u=rwx,go=rx mkplc.sh @prefix@/@bindir@
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+%.o: %.c
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+holders/libcontainers.a: force
+	(cd holders;make)
+
+force: ;
+
+include @top_srcdir@/Rules.mk
+

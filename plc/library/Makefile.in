@@ -1,0 +1,10 @@
+TARGETDIR=@prefix@/@datadir@/plc
+
+all:
+
+install:
+	@INSTALL@ -d $(TARGETDIR)
+	@INSTALL@ --mode=0644 *.plc $(TARGETDIR)
+
+include @top_srcdir@/Rules.mk
+

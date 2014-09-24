@@ -1,0 +1,4 @@
+PLC which provides driver-managing capabilities (dynamic driver registration
+and mapping to PLC addresses)
+
+This module must be loaded before loading compiled PLC modules!

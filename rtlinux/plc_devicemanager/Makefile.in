@@ -1,0 +1,18 @@
+include @top_srcdir@/rtl.mk
+
+CXXFLAGS+= -DPLC_MAX_DEVICES=10 -I../../kernel-library/include
+
+CRTBEGIN=`g++ -print-file-name=crtbegin.o`
+CRTEND=`g++ -print-file-name=crtend.o`
+
+plc_devicemanager.o: manager.o
+	$(LD) -r -o plc_devicemanager.o $(CRTBEGIN) manager.o $(CRTEND)
+
+clean:
+	rm -f *.o
+
+install:
+	cp -f plc_devicemanager.o @KERNEL_MODULES@
+	depmod -a
+
+include @top_srcdir@/Rules.mk

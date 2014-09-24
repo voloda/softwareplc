@@ -1,0 +1,8 @@
+*.o
+*.swp
+config.*
+Make.flags
+Rules.mk
+.depend
+configure
+Makefile

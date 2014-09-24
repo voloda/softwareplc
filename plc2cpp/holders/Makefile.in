@@ -1,0 +1,17 @@
+include @top_srcdir@/Make.flags
+
+CXXFLAGS+= -I../include
+
+COBJS+= ccodeprocessor.o ccontainervariable.o ccontaineril.o 
+COBJS+= ccontainerfunction.o ccontainerbase.o ccontainervarblock.o
+COBJS+= ccontainerincludes.o ccontainerfbprogram.o
+COBJS+= ccontainerconfiguration.o ccontainertask.o ccontainerpcall.o
+
+libcontainers.a: $(COBJS)
+	rm -f $@
+	$(AR) -rc $@ $(COBJS)
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+include @top_srcdir@/Rules.mk

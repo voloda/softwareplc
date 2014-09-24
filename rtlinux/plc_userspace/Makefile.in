@@ -1,0 +1,23 @@
+include @top_srcdir@/rtl.mk
+
+CXXFLAGS+= -DPLC_MAX_DEVICES=10 -I../../kernel-library/include
+
+CRTBEGIN=`g++ -print-file-name=crtbegin.o`
+CRTEND=`g++ -print-file-name=crtend.o`
+
+all: plc_uspacedriver.o communicate
+
+plc_uspacedriver.o: userspace.o
+	$(LD) -r -o plc_uspacedriver.o $(CRTBEGIN) userspace.o $(CRTEND)
+
+communicate: communicate.cpp
+	$(CXX) communicate.cpp -o communicate
+
+clean:
+	rm -f *.o
+
+install:
+	cp -f plc_uspacedriver.o @KERNEL_MODULES@
+	depmod -a
+ 
+include @top_srcdir@/Rules.mk

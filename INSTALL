@@ -1,0 +1,62 @@
+Software PLC for RT-Linux install instructions:
+===============================================
+
+ 1. Install RT-Linux for your kernel. See instructions on RT-Linux web site
+    (http://www.fsmlabs.com)
+
+ 2. Download latest sources from http://sourceforge.net/projects/softwareplc
+
+ 3. Unpack sources into work directory:
+         ]# tar xzf SoftwarePLC-x.yy.tgz
+
+ 4. Change current directory to sources:
+         ]# cd SoftwarePLC-x.yy
+
+ 5. Run configuration script:
+         ]# ./configure
+    
+    This generates Makefiles for all modules contained in project
+
+ 6. Compile program:
+	 ]# make dep
+	 ]# make
+
+ 7. Install software:
+	 ]# make install
+
+ 8. For instructions about creating PLC see README or sample projects
+    in plc subdirectory
+
+Description of files and directories in archive:
+================================================
+\_
+|  plc - sample projects in IL language
+|     \_
+|     | skeleton - skeleton for creation of new PLC project
+|     \_
+|       library - library entries in IL language for usage with software
+|                 PLC. Contains some simple functions and function blocks.
+\_
+| kernel-library - Support library in C++. Required for compilation of
+|                  generated C++ sources from IL. 
+| 
+\_
+|  plc2cpp - compiler for IL language. Converts programs in IL into C++.
+\_
+  rtlinux - modules in C/C++ with drivers and kernel modules
+         \_
+         | plc_devicemanager - Device driver manager for PLC. Must be loaded
+         |                     when inserting PLC compiled module into
+         |                      kernel-space
+         \_
+         | plc_lpt - Parallel port driver. Allows controling of inputs and
+         |           outputs, sets one of input addresses when interrupt is
+         |           triggered
+         \_
+           plc_userspace - Driver for communication between Software PLC and
+         |                 RT-Linux user-space. Usefull for visualisation.
+         |                 Uses RT-Linux fifos.
+         \_
+           rtl_cpp - Rewritten rtl_cpp module from original RT-Linux 
+                     distribution. Required by some build of GCC
+

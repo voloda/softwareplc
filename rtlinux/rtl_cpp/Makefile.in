@@ -1,0 +1,15 @@
+all: rtl_cpp.o
+
+include @top_srcdir@/rtl.mk
+
+CRTBEGIN=`g++ -print-file-name=crtbegin.o` 
+CRTEND=`g++ -print-file-name=crtend.o`
+
+clean:
+	rm -f *.o
+
+install:
+	cp -f rtl_cpp.o @KERNEL_MODULES@
+	depmod -a
+ 
+include $(RTL_DIR)/Rules.make

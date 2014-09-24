@@ -1,0 +1,16 @@
+include @top_srcdir@/rtl.mk
+
+CXXFLAGS+= -DPLC_MAX_DEVICES=10 -I../../kernel-library/include
+
+CRTBEGIN=`g++ -print-file-name=crtbegin.o`
+CRTEND=`g++ -print-file-name=crtend.o`
+
+OBJS=labcard.o drv.o drv_sup.o
+
+plc_labcard.o: $(OBJS)
+	$(LD) -r -o plc_labcard.o $(CRTBEGIN) $(OBJS) $(CRTEND)
+
+clean:
+	rm -f *.o
+
+include @top_srcdir@/Rules.mk

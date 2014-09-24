@@ -1,0 +1,77 @@
+(* *************************************** *)
+(* PLC library                             *)
+(* *************************************** *)
+(* PID controler                           *)
+(* Version: $Revision: 1.1 $                     *)
+(* Last change: $Date                      *)
+(* Author: Voloda <Vladimir.Kloz@dtg.cz>   *)
+(* *************************************** *)
+(* Inputs:                                 *)
+(*  P - proportional constant of controler *)
+(*  I - integral constant of controler     *)
+(*  D - derivative constant of controler   *)
+(*  PV - current process variable          *)
+(*                                         *)
+(* Outputs:                                *)
+(*  AV - action variable                   *)
+(* *************************************** *)
+(* Include: max.plc, min.plc *)
+FUNCTION_BLOCK	pid
+	VAR_INPUT
+		P: DINT := 0;
+		I: DINT := 0;
+		D: DINT := 0;
+		ISAT: DINT := 16#0fff_ffff_ffff_ffff;
+		PV: DINT := 0;
+	END_VAR
+	VAR_OUTPUT
+		AV: UDINT := 0; (* Action Variable *)
+	END_VAR
+	VAR
+		OLD_PV: DINT := 0;
+		INTEGRATION: DINT := 0;
+		TMPSAT: DINT;
+	END_VAR
+
+	(* Calculate P part of controler *)
+	LD	P
+	MUL	PV
+	ST	AV
+
+	(* Calculate D part of controler *)
+	LD	PV
+	SUB	OLD_PV
+	MUL	D
+	ADD	AV
+	ST	AV
+
+	(* Calculate I part of controler *)
+	LD	PV
+	ADD	INTEGRATION
+
+	min	ISAT
+
+	ST	INTEGRATION
+
+	LD	ISAT
+	
+	LD	ISAT
+	MUL	-1
+	ST	TMPSAT
+
+	LD	INTEGRATION
+	max	TMPSAT
+
+	ST	INTEGRATION
+
+	MUL	I
+
+	(* Compute sum for controler output *)
+	ADD	AV
+
+	ST	AV
+
+	LD	PV
+	ST	OLD_PV
+END_FUNCTION_BLOCK
+

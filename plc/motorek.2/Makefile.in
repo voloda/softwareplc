@@ -1,0 +1,44 @@
+# This is automaticaly generated file for SoftwarePLC
+# from project skeleton
+
+PROJECT_NAME=@PROJECT@
+
+PLC2CPP=plc2cpp
+
+# Add specific library directories if you have any
+# LIBFLAGS=-L dir1,dir2
+
+# Add your PLC source files here and uncomment
+# You must have sources in current directory
+# and add it to list of files with temporary prefix
+# deps. The temporary file in deps directory is
+# used by make for building (for example you have source
+# file filename.plc and for compilation you add it as
+# deps/filename.plc
+# FILES=deps/filename.plc
+
+all: $(FILES)
+# find generated sources, regenerate makefile
+# and execute make. It will produce software PLC
+# module in subdirectory sources
+	@(cd sources;for x in `ls *.cpp`; do \
+		obj=`echo $$x|sed "s/\.cpp$//.o/g"`;\
+		objs="$$objs $$obj";\
+	done;\
+	sed "s/^OBJS=.*$//OBJS=$$objs/g" Makefile.in | sed "s/@PROJECT_NAME@/$(PROJECT_NAME)/g" > Makefile;\
+	make)
+
+deps/%.plc: %.plc
+	@(if (test -f $@); then\
+		for file in `cat $@`; do \
+			rm -f $$file;\
+		done;\
+	fi)
+	$(PLC2CPP) $(LIBFLAGS) -p $(PROJECT_NAME) -s $< -l deps/$(<F)
+
+clean:
+	rm -f deps/*
+	rm -f sources/*.cpp 
+	rm -f sources/*.o
+	rm -f sources/include/*.h
+

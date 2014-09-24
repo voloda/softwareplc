@@ -1,0 +1,8 @@
+
+ifneq ($(wildcard .depend),)
+include .depend
+endif
+
+dep:
+	(($(CC) $(CFLAGS) -M *.c > .depend 2> /dev/null);($(CXX) $(CXXFLAGS) -M *.cpp >> .depend 2> /dev/null);cd .); 
+

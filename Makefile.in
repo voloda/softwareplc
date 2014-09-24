@@ -1,0 +1,37 @@
+include @top_srcdir@/Make.flags
+
+all: dep
+	for x in `find . -name Makefile`; do \
+		F=`echo $$x|sed 's/Makefile$$//g'`; \
+		if (test $$F != './'); then \
+			(cd $$F;make); \
+		fi;\
+	done;
+
+dep: 
+	for x in `find . -name 'Makefile'`; do \
+		F=`echo $$x|sed 's/Makefile$$//g'`; \
+		echo "Dependencies in directory: $$F";\
+		if (test $$F != "./"); then\
+			(cd $$F;make dep;);\
+		fi;\
+	done;
+
+clean:
+	for x in `find . -name 'Makefile'`; do \
+		F=`echo $$x|sed 's/Makefile$$//g'`; \
+		(cd $$F; rm -f *.o .depend); \
+	done;
+
+	rm -f config.*
+
+install:
+	for x in `find . -name 'Makefile'`; do \
+		F=`echo $$x|sed 's/Makefile$$//g'`; \
+		if ( test $$F != "./" ); then\
+			if ( grep -e "^install\:" $$x ); then \
+				(cd $$F; make install); \
+			fi \
+		fi\
+	done;
+

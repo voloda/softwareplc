@@ -1,0 +1,14 @@
+FUNCTION min: DINT
+	VAR_INPUT
+		val1: DINT;
+		val2: DINT;
+	END_VAR
+
+	LD	val1
+	ST	min
+	LT	val2
+	RETC
+	
+	LD	val2
+	ST	min
+END_FUNCTION

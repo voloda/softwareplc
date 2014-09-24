@@ -1,0 +1,17 @@
+PLC_PROJECT=plc_@PROJECT_NAME@.o
+
+include rtl.mk
+
+CXXFLAGS+=-Iinclude -I. -DPLC_MEMORY_SIZE=16384 -DPLC_MAX_DEVICES=10 
+CXXFLAGS+=`mkplc.sh --cppflags`
+
+CRTBEGIN=`g++ -print-file-name=crtbegin.o`
+CRTEND=`g++ -print-file-name=crtend.o`
+
+OBJS=%OBJECTS%
+
+all: $(PLC_PROJECT)
+
+$(PLC_PROJECT): $(OBJS)
+	$(LD) -r -o $(PLC_PROJECT) $(CRTBEGIN) $(OBJS) $(CRTEND)
+

@@ -1,0 +1,33 @@
+Creating new project:
+
+For example, if you would like to create project with name "foo"
+located in subdirectory foo of your home type:
+
+   tmp]# mkplc.sh --create fooo --target-dir ~/foo
+
+If your project consist from source file foo.plc, you must add it
+to makefile, so edit file ~/foo/Makefile. Find this line in original
+Makefile:
+
+# FILES=deps/filename.plc
+
+and change it to:
+
+FILE=deps/foo.plc
+
+Now create source file foo.plc with PLC program in instruction list.
+When you would like compile it, simple type:
+
+   foo]# make
+
+In subdirectory sources you can find file named plc_foo.o, which
+represents Software PLC as kernel module. If you have already started
+RT-Linux modules and selected Software PLC drivers, you can start
+software PLC by typing:
+
+   foo]# make start
+
+If you want stop PLC, type:
+
+   foo]# make stop
+

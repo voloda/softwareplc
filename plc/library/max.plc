@@ -1,0 +1,14 @@
+FUNCTION max: DINT
+	VAR_INPUT
+		val1: DINT;
+		val2: DINT;
+	END_VAR
+
+	LD	val1
+	ST	max
+	GT	val2
+	RETC
+	
+	LD	val2
+	ST	max
+END_FUNCTION

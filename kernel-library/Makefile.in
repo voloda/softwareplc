@@ -1,0 +1,9 @@
+include @top_srcdir@/Make.flags
+
+all: 
+
+install:
+	@INSTALL@ -d @prefix@/@includedir@/plc
+	@INSTALL@ --mode=0644 include/*.h @prefix@/@includedir@/plc
+
+include @top_srcdir@/Rules.mk
